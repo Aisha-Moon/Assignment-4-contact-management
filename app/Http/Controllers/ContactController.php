@@ -7,11 +7,19 @@ use Illuminate\Http\Request;
 
 class ContactController extends Controller
 {
-    public function index(Request $request)
-    {
-        $data['contacts'] = Contact::getRecord($request);
-        return view('contacts.index', $data);
-    }
+        public function index(Request $request)
+        {
+            $sort = $request->get('sort', 'name');
+            $order = $request->get('order', 'asc');
+            $search = $request->get('search', '');
+
+            $contacts = Contact::where('name', 'like', "%{$search}%")
+                ->orWhere('email', 'like', "%{$search}%")
+                ->orderBy($sort, $order)
+                ->paginate(10);
+
+            return view('contacts.index', compact('contacts', 'sort', 'order', 'search'));
+        }    
 
     public function create()
     {

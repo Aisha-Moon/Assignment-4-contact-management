@@ -1,5 +1,3 @@
-<!-- resources/views/contacts/index.blade.php -->
-
 @extends('layout')
 
 @section('content')
@@ -9,30 +7,21 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center flex-wrap">
                         <h4 class="card-title">Search Contact</h4>
-
                     </div>
 
                     <form method="GET" action="">
                         <div class="row">
-                            <div class="col-sm-3">
+                            <div class="col-sm-6">
                                 <div class="mb-3">
-                                    <label for="name" class="form-label">Name</label>
-                                    <input type="text" id="name" name="name" value="{{ Request()->name }}" class="form-control" placeholder="Enter Name">
+                                    <label for="search" class="form-label">Search by Name or Email</label>
+                                    <input type="text" id="search" name="search" value="{{ request()->search }}" class="form-control" placeholder="Enter Name or Email">
                                 </div>
                             </div>
-                            <div class="col-sm-3">
-                                <div class="mb-3">
-                                    <label for="email" class="form-label">Email</label>
-                                    <input type="text" id="email" name="email" value="{{ Request()->email }}" class="form-control" placeholder="Enter Email">
-                                </div>
+                            <div class="col-sm-3 mt-4">
+                                <button type="submit" class="btn btn-primary">Search</button>
+                                <a href="{{ url('/contacts') }}" class="btn btn-danger">Reset</a>
                             </div>
-
-                        <div class="col-sm-3 mt-4">
-                        <button type="submit" class="btn btn-primary">Search</button>
-                        <a href="{{ url('/contacts') }}" class="btn btn-danger">Reset</a>
-
-                </div>
-                </div>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -55,11 +44,11 @@
                     <table class="table">
                         <thead>
                             <tr>
-                                <th>Name</th>
+                                <th><a href="{{ url('/contacts?sort=name&order=' . (request()->get('order') == 'asc' ? 'desc' : 'asc') . '&search=' . request()->get('search')) }}">Name</a></th>
                                 <th>Email</th>
                                 <th>Phone</th>
                                 <th>Address</th>
-                                <th>Created At</th>
+                                <th><a href="{{ url('/contacts?sort=created_at&order=' . (request()->get('order') == 'asc' ? 'desc' : 'asc') . '&search=' . request()->get('search')) }}">Created At</a></th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -81,17 +70,18 @@
                                         </form>
                                     </td>
                                 </tr>
-                                @empty
+                            @empty
                                 <tr>
                                     <td colspan="12" class="text-center text-danger">No Record Found</td>
                                 </tr>
-
-                                @endforelse
+                            @endforelse
                         </tbody>
                     </table>
 
+
+
                     <div class="pagination">
-                        {{ $contacts->appends(['name' => request()->get('name'), 'email' => request()->get('email')])->links() }}
+                        {{ $contacts->appends(request()->input())->links() }}
                     </div>
                 </div>
             </div>
