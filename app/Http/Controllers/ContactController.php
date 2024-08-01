@@ -7,19 +7,26 @@ use Illuminate\Http\Request;
 
 class ContactController extends Controller
 {
-        public function index(Request $request)
-        {
-            $sort = $request->get('sort', 'name');
-            $order = $request->get('order', 'asc');
-            $search = $request->get('search', '');
+    public function index(Request $request)
+    {
+        $search = $request->get('search', '');
+        $sort = $request->get('sort', 'name');
+        $order = $request->get('order', 'asc');
 
-            $contacts = Contact::where('name', 'like', "%{$search}%")
-                ->orWhere('email', 'like', "%{$search}%")
-                ->orderBy($sort, $order)
-                ->paginate(10);
+        $contacts = Contact::query()
+            ->when($search, function ($query) use ($search) {
+                return $query->where('name', 'like', "%{$search}%")
+                             ->orWhere('email', 'like', "%{$search}%");
+            })
+            ->orderBy($sort, $order)
+            ->paginate(10);
 
-            return view('contacts.index', compact('contacts', 'sort', 'order', 'search'));
-        }    
+        return view('contacts.index', compact('contacts'));
+    }
+
+
+
+
 
     public function create()
     {
@@ -43,7 +50,7 @@ class ContactController extends Controller
     public function show($id)
     {
         $contact = Contact::findOrFail($id);
-        return view('contacts.show', ['contact' => $contact]);
+        return view('contacts.show', compact('contact'));
     }
 
     public function edit($id)

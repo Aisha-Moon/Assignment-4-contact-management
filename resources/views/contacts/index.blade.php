@@ -9,7 +9,7 @@
                         <h4 class="card-title">Search Contact</h4>
                     </div>
 
-                    <form method="GET" action="">
+                    <form method="GET" action="" id="searchForm">
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="mb-3">
@@ -21,7 +21,17 @@
                                 <button type="submit" class="btn btn-primary">Search</button>
                                 <a href="{{ url('/contacts') }}" class="btn btn-danger">Reset</a>
                             </div>
+                            <div class="col-sm-3">
+                                <div class="mb-3">
+                                    <label for="sort" class="form-label">Sort By</label>
+                                    <select id="sort" name="sort" class="form-control" onchange="updateSortOrder()">
+                                        <option value="name" {{ request()->sort == 'name' ? 'selected' : '' }}>Name</option>
+                                        <option value="created_at" {{ request()->sort == 'created_at' ? 'selected' : '' }}>Created At</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
+                        <input type="hidden" name="order" id="order" value="{{ request()->order ?? 'asc' }}">
                     </form>
                 </div>
             </div>
@@ -78,8 +88,6 @@
                         </tbody>
                     </table>
 
-
-
                     <div class="pagination">
                         {{ $contacts->appends(request()->input())->links() }}
                     </div>
@@ -87,4 +95,46 @@
             </div>
         </div>
     </div>
+
+    <script>
+       /* function updateSortOrder() {
+            let sortSelect = document.getElementById('sort');
+            let currentOrder = document.getElementById('order').value;
+
+            // Toggle the order if the same sort is selected again
+            if (sortSelect.value === "{{ request()->sort }}") {
+                document.getElementById('order').value = currentOrder === 'asc' ? 'desc' : 'asc';
+            } else {
+                document.getElementById('order').value = 'asc';
+            }
+
+            document.getElementById('searchForm').submit();
+        } */
+
+        function updateSortOrder() {
+    let sort = document.getElementById('sort').value;
+    let currentUrl = new URL(window.location.href);
+    let params = new URLSearchParams(currentUrl.search);
+
+    if (sort === 'name') {
+        params.set('sort', 'name');
+    } else if (sort === 'created_at') {
+        params.set('sort', 'created_at');
+    }
+
+    // Toggle the order parameter
+    let currentOrder = params.get('order');
+    params.set('order', currentOrder === 'asc' ? 'desc' : 'asc');
+
+    // Keep the current search parameter
+    let search = params.get('search') || '';
+    params.set('search', search);
+
+    // Update the URL
+    window.location.href = `${currentUrl.pathname}?${params.toString()}`;
+}
+
+
+
+    </script>
 @endsection
